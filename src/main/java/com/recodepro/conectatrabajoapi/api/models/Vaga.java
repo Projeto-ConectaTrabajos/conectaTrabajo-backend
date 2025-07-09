@@ -32,6 +32,8 @@ public class Vaga {
     @JoinColumn(name = "Id_Empresa", referencedColumnName = "Id_Empresa")
     private Empresa empresa;
 
+    // Getters e Setters
+
     public Long getIdVaga() {
         return idVaga;
     }

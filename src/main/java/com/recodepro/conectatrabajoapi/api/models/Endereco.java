@@ -1,6 +1,7 @@
 package com.recodepro.conectatrabajoapi.api.models;
 
 import jakarta.persistence.*;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 @Entity
 @Table(name = "Endereco")
@@ -12,7 +13,7 @@ public class Endereco {
     private Long idEndereco;
 
     private String rua;
-    private Integer numero;
+    private String numero;
     private String complemento;
     private String bairro;
     private String cidade;
@@ -20,11 +21,11 @@ public class Endereco {
     private String cep;
 
     @ManyToOne
-    @JoinColumn(name = "ID_Usuario")
+    @JoinColumn(name = "Id_Usuario")
     private Usuario usuario;
 
     @ManyToOne
-    @JoinColumn(name = "ID_Empresa")
+    @JoinColumn(name = "Id_Empresa")
     private Empresa empresa;
 
     // Getters e Setters
@@ -46,11 +47,11 @@ public class Endereco {
         this.rua = rua;
     }
 
-    public Integer getNumero() {
+    public String getNumero() {
         return numero;
     }
 
-    public void setNumero(Integer numero) {
+    public void setNumero(String numero) {
         this.numero = numero;
     }
 

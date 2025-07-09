@@ -1,6 +1,5 @@
 package com.recodepro.conectatrabajoapi.api.controllers;
 
-//package br.com.buildar.api.controllers;
 import com.recodepro.conectatrabajoapi.api.models.Empresa;
 import com.recodepro.conectatrabajoapi.api.repositories.EmpresaRepository;
 
@@ -30,7 +29,7 @@ public class EmpresaController {
 
     // PUT: Atualizar uma empresa por ID
     @PutMapping("/{id}")
-    public Empresa atualizarEmpresa(
+    public ResponseEntity<Empresa> atualizarEmpresa(
             @PathVariable Long id,
             @RequestBody Empresa empresaAtualizada
     ) {
@@ -39,14 +38,13 @@ public class EmpresaController {
                     empresa.setNome(empresaAtualizada.getNome());
                     empresa.setCnpj(empresaAtualizada.getCnpj());
                     empresa.setEmail(empresaAtualizada.getEmail());
-                    // Atualize outros campos conforme necessário...
-                    return empresaRepository.save(empresa);
+                    empresa.setSenha(empresaAtualizada.getSenha()); //
+                    // Não atualize a lista de vagas aqui!
+                    return ResponseEntity.ok(empresaRepository.save(empresa));
                 })
-                .orElseGet(() -> {
-                    empresaAtualizada.setIdEmpresa(id);
-                    return empresaRepository.save(empresaAtualizada);
-                });
+                .orElse(ResponseEntity.notFound().build());
     }
+
 
     // DELETE: Remover uma empresa por ID
     @DeleteMapping("/{id}")

@@ -1,13 +1,21 @@
 package com.recodepro.conectatrabajoapi.api.controllers;
 
-import com.recodepro.conectatrabajoapi.api.models.Endereco;
-import com.recodepro.conectatrabajoapi.api.repositories.EnderecoRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 import java.util.Optional;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.recodepro.conectatrabajoapi.api.models.Endereco;
+import com.recodepro.conectatrabajoapi.api.repositories.EnderecoRepository;
 
 @RestController
 @RequestMapping("/enderecos")
@@ -19,13 +27,20 @@ public class EnderecoController {
     // Criar endereço
     @PostMapping
     public ResponseEntity<Endereco> criarEndereco(@RequestBody Endereco endereco) {
-        return ResponseEntity.ok(enderecoRepository.save(endereco));
-    }
+        // Validação de relacionamento (usuário OU empresa)
+        if ((endereco.getUsuario() == null && endereco.getEmpresa() == null) ||
+                (endereco.getUsuario() != null && endereco.getEmpresa() != null)) {
+            return ResponseEntity.badRequest().build();
+        }
 
-    // Listar todos endereços
-    @GetMapping
-    public List<Endereco> listarEnderecos() {
-        return enderecoRepository.findAll();
+        // Validação e formatação do CEP
+        String cep = endereco.getCep().replace("-", "").replace(" ", "");
+        if (cep.length() != 8 || !cep.matches("\\d+")) {
+            return ResponseEntity.badRequest().build();
+        }
+        endereco.setCep(cep);
+
+        return ResponseEntity.ok(enderecoRepository.save(endereco));
     }
 
     // Buscar endereço por ID
@@ -43,7 +58,11 @@ public class EnderecoController {
                 .map(endereco -> {
                     endereco.setRua(enderecoAtualizado.getRua());
                     endereco.setNumero(enderecoAtualizado.getNumero());
-                    // Atualize outros campos conforme necessário
+                    endereco.setComplemento(enderecoAtualizado.getComplemento());
+                    endereco.setBairro(enderecoAtualizado.getBairro());
+                    endereco.setCidade(enderecoAtualizado.getCidade());
+                    endereco.setEstado(enderecoAtualizado.getEstado());
+                    endereco.setCep(enderecoAtualizado.getCep());
                     return ResponseEntity.ok(enderecoRepository.save(endereco));
                 })
                 .orElse(ResponseEntity.notFound().build());
@@ -69,11 +88,5 @@ public class EnderecoController {
     @GetMapping("/empresa/{empresaId}")
     public List<Endereco> listarPorEmpresa(@PathVariable Long empresaId) {
         return enderecoRepository.findByEmpresa_IdEmpresa(empresaId);
-    }
-
-    // Buscar por CEP
-    @GetMapping("/cep/{cep}")
-    public List<Endereco> listarPorCep(@PathVariable String cep) {
-        return enderecoRepository.findByCep(cep);
     }
 }

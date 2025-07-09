@@ -1,7 +1,5 @@
 package com.recodepro.conectatrabajoapi.api.controllers;
 
-//package br.com.buildar.api.controllers;
-
 import com.recodepro.conectatrabajoapi.api.models.Vaga;
 import com.recodepro.conectatrabajoapi.api.repositories.VagaRepository;
 
@@ -28,17 +26,24 @@ public class VagaController {
     }
 
     @PutMapping("/{id}")
-    public Vaga atualizarVaga(@PathVariable Long id, @RequestBody Vaga vagaAtualizada) {
+    public ResponseEntity<Vaga> atualizarVaga(@PathVariable Long id, @RequestBody Vaga vagaAtualizada) {
         return vagaRepository.findById(id)
                 .map(vaga -> {
                     vaga.setTitulo(vagaAtualizada.getTitulo());
-                    // Atualize outros campos...
-                    return vagaRepository.save(vaga);
+                    vaga.setLocalizacao(vagaAtualizada.getLocalizacao());
+                    vaga.setCompetencias(vagaAtualizada.getCompetencias());
+                    vaga.setDataPublicacao(vagaAtualizada.getDataPublicacao());
+                    vaga.setModalidade(vagaAtualizada.getModalidade());
+                    vaga.setRequisitos(vagaAtualizada.getRequisitos());
+                    vaga.setBeneficios(vagaAtualizada.getBeneficios());
+                    vaga.setResponsabilidade(vagaAtualizada.getResponsabilidade());
+                    vaga.setDescricaoEmpresa(vagaAtualizada.getDescricaoEmpresa());
+                    vaga.setDescricao(vagaAtualizada.getDescricao());
+                    vaga.setSalario(vagaAtualizada.getSalario());
+
+                    return ResponseEntity.ok(vagaRepository.save(vaga));
                 })
-                .orElseGet(() -> {
-                    vagaAtualizada.setIdVaga(id);
-                    return vagaRepository.save(vagaAtualizada);
-                });
+                .orElse(ResponseEntity.notFound().build());
     }
 
     @DeleteMapping("/{id}")

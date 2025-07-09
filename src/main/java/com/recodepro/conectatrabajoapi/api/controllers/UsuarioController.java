@@ -42,8 +42,16 @@ public class UsuarioController {
         return usuarioRepository.findById(id)
                 .map(usuario -> {
                     usuario.setNome(usuarioAtualizado.getNome());
+                    usuario.setSobrenome(usuarioAtualizado.getSobrenome());
                     usuario.setEmail(usuarioAtualizado.getEmail());
-                    // Atualize outros campos conforme necessário
+                    usuario.setCpf(usuarioAtualizado.getCpf());
+                    usuario.setRne(usuarioAtualizado.getRne());
+                    usuario.setTelefone(usuarioAtualizado.getTelefone());
+                    usuario.setEtnia(usuarioAtualizado.getEtnia());
+                    usuario.setPaisOrigem(usuarioAtualizado.getPaisOrigem());
+//                    usuario.setSenha(usuarioAtualizado.getSenha());
+                    usuario.setDataNascimento(usuarioAtualizado.getDataNascimento());
+
                     return ResponseEntity.ok(usuarioRepository.save(usuario));
                 })
                 .orElse(ResponseEntity.notFound().build());
