@@ -1,0 +1,766 @@
+openapi: 3.0.1
+info:
+  title: Conecta Trabalho API
+  description: API para o sistema Conecta Trabalho - Recode Pro
+  version: 1.0.0
+  contact:
+    name: Suporte
+    email: suporte@conectatrabalho.com
+servers:
+  - url: http://localhost:8080
+    description: Servidor local de desenvolvimento
+tags:
+  - name: Candidaturas
+    description: Operações relacionadas a candidaturas
+  - name: Empresas
+    description: Operações relacionadas a empresas
+  - name: Endereços
+    description: Operações relacionadas a endereços
+  - name: Usuários
+    description: Operações relacionadas a usuários
+  - name: Vagas
+    description: Operações relacionadas a vagas de emprego
+paths:
+  /candidaturas:
+    post:
+      tags:
+        - Candidaturas
+      summary: Criar candidatura
+      description: Registra uma nova candidatura a vaga
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Candidatura'
+      responses:
+        '200':
+          description: Candidatura criada com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Candidatura'
+        '400':
+          description: Dados inválidos
+
+  /candidaturas/vaga/{vagaId}:
+    get:
+      tags:
+        - Candidaturas
+      summary: Listar por vaga
+      description: Retorna candidaturas de uma vaga específica
+      parameters:
+        - name: vagaId
+          in: path
+          required: true
+          schema:
+            type: integer
+            example: 1
+      responses:
+        '200':
+          description: Candidaturas encontradas
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Candidatura'
+        '404':
+          description: Vaga não encontrada
+
+  /empresas:
+    get:
+      tags:
+        - Empresas
+      summary: Listar empresas
+      description: Retorna todas empresas cadastradas
+      responses:
+        '200':
+          description: Lista de empresas
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Empresa'
+    post:
+      tags:
+        - Empresas
+      summary: Criar empresa
+      description: Cadastra uma nova empresa
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Empresa'
+      responses:
+        '200':
+          description: Empresa criada com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Empresa'
+        '400':
+          description: Dados inválidos
+
+  /empresas/{id}:
+    put:
+      tags:
+        - Empresas
+      summary: Atualizar dados da empresa
+      description: Atualiza os dados básicos de uma empresa (não inclui senha ou vagas)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            example: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EmpresaAtualizacao'
+      responses:
+        '200':
+          description: Empresa atualizada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Empresa'
+        '400':
+          description: Dados inválidos
+        '404':
+          description: Empresa não encontrada
+    delete:
+      tags:
+        - Empresas
+      summary: Excluir empresa
+      description: Remove uma empresa do sistema
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            example: 1
+      responses:
+        '204':
+          description: Empresa excluída
+        '404':
+          description: Empresa não encontrada
+
+  /enderecos:
+    post:
+      tags:
+        - Endereços
+      summary: Criar endereço
+      description: Cadastra um novo endereço (deve estar associado a um usuário OU uma empresa)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Endereco'
+      responses:
+        '200':
+          description: Endereço criado com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Endereco'
+        '400':
+          description: Dados inválidos ou CEP inválido
+
+  /enderecos/{id}:
+    get:
+      tags:
+        - Endereços
+      summary: Buscar endereço por ID
+      description: Retorna um endereço específico
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            example: 1
+      responses:
+        '200':
+          description: Endereço encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Endereco'
+        '404':
+          description: Endereço não encontrado
+    put:
+      tags:
+        - Endereços
+      summary: Atualizar endereço
+      description: Atualiza os dados de um endereço
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            example: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Endereco'
+      responses:
+        '200':
+          description: Endereço atualizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Endereco'
+        '404':
+          description: Endereço não encontrado
+    delete:
+      tags:
+        - Endereços
+      summary: Excluir endereço
+      description: Remove um endereço do sistema
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            example: 1
+      responses:
+        '204':
+          description: Endereço excluído
+        '404':
+          description: Endereço não encontrado
+
+  /enderecos/usuario/{usuarioId}:
+    get:
+      tags:
+        - Endereços
+      summary: Listar endereços por usuário
+      description: Retorna endereços de um usuário específico
+      parameters:
+        - name: usuarioId
+          in: path
+          required: true
+          schema:
+            type: integer
+            example: 1
+      responses:
+        '200':
+          description: Endereços encontrados
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Endereco'
+
+  /enderecos/empresa/{empresaId}:
+    get:
+      tags:
+        - Endereços
+      summary: Listar endereços por empresa
+      description: Retorna endereços de uma empresa específica
+      parameters:
+        - name: empresaId
+          in: path
+          required: true
+          schema:
+            type: integer
+            example: 1
+      responses:
+        '200':
+          description: Endereços encontrados
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Endereco'
+
+  /usuarios:
+    get:
+      tags:
+        - Usuários
+      summary: Listar usuários
+      description: Retorna todos usuários cadastrados
+      responses:
+        '200':
+          description: Lista de usuários
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Usuario'
+    post:
+      tags:
+        - Usuários
+      summary: Criar usuário
+      description: Cadastra um novo usuário
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Usuario'
+      responses:
+        '200':
+          description: Usuário criado com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Usuario'
+        '400':
+          description: Dados inválidos
+
+  /usuarios/{id}:
+    get:
+      tags:
+        - Usuários
+      summary: Buscar usuário por ID
+      description: Retorna um usuário específico
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            example: 1
+      responses:
+        '200':
+          description: Usuário encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Usuario'
+        '404':
+          description: Usuário não encontrado
+    put:
+      tags:
+        - Usuários
+      summary: Atualizar usuário
+      description: Atualiza os dados de um usuário
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            example: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UsuarioAtualizacao'
+      responses:
+        '200':
+          description: Usuário atualizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Usuario'
+        '400':
+          description: Dados inválidos
+        '404':
+          description: Usuário não encontrado
+    delete:
+      tags:
+        - Usuários
+      summary: Excluir usuário
+      description: Remove um usuário do sistema
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            example: 1
+      responses:
+        '204':
+          description: Usuário excluído
+        '404':
+          description: Usuário não encontrado
+
+  /usuarios/email/{email}:
+    get:
+      tags:
+        - Usuários
+      summary: Buscar por email
+      description: Retorna um usuário pelo email
+      parameters:
+        - name: email
+          in: path
+          required: true
+          schema:
+            type: string
+            example: "usuario@exemplo.com"
+      responses:
+        '200':
+          description: Usuário encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Usuario'
+        '404':
+          description: Usuário não encontrado
+
+  /vagas:
+    get:
+      tags:
+        - Vagas
+      summary: Listar vagas
+      description: Retorna todas vagas cadastradas
+      responses:
+        '200':
+          description: Lista de vagas
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Vaga'
+    post:
+      tags:
+        - Vagas
+      summary: Criar vaga
+      description: Cadastra uma nova vaga de emprego
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Vaga'
+      responses:
+        '200':
+          description: Vaga criada com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Vaga'
+        '400':
+          description: Dados inválidos
+
+  /vagas/{id}:
+    put:
+      tags:
+        - Vagas
+      summary: Atualizar vaga
+      description: Atualiza os dados de uma vaga
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            example: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VagaAtualizacao'
+      responses:
+        '200':
+          description: Vaga atualizada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Vaga'
+        '400':
+          description: Dados inválidos
+        '404':
+          description: Vaga não encontrada
+    delete:
+      tags:
+        - Vagas
+      summary: Excluir vaga
+      description: Remove uma vaga do sistema
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            example: 1
+      responses:
+        '204':
+          description: Vaga excluída
+        '404':
+          description: Vaga não encontrada
+
+components:
+  schemas:
+    Candidatura:
+      type: object
+      properties:
+        idCandidatura:
+          type: integer
+          example: 1
+          readOnly: true
+        dataEnvio:
+          type: string
+          format: date
+          example: "2023-01-01"
+        cpf:
+          type: string
+          example: "123.456.789-00"
+        usuario:
+          $ref: '#/components/schemas/Usuario'
+        vaga:
+          $ref: '#/components/schemas/Vaga'
+      required:
+        - cpf
+        - vaga
+
+    Empresa:
+      type: object
+      properties:
+        idEmpresa:
+          type: integer
+          example: 1
+          readOnly: true
+        cnpj:
+          type: string
+          example: "12.345.678/0001-90"
+        email:
+          type: string
+          example: "empresa@exemplo.com"
+        nome:
+          type: string
+          example: "Empresa Exemplo Ltda"
+        senha:
+          type: string
+          example: "senha123"
+          writeOnly: true
+        vagas:
+          type: array
+          items:
+            $ref: '#/components/schemas/Vaga'
+          readOnly: true
+      required:
+        - cnpj
+        - email
+        - nome
+        - senha
+
+    EmpresaAtualizacao:
+      type: object
+      properties:
+        nome:
+          type: string
+          example: "Empresa Exemplo Ltda"
+        email:
+          type: string
+          example: "empresa@exemplo.com"
+        cnpj:
+          type: string
+          example: "12.345.678/0001-90"
+      required:
+        - nome
+        - email
+        - cnpj
+
+    Endereco:
+      type: object
+      properties:
+        idEndereco:
+          type: integer
+          example: 1
+          readOnly: true
+        rua:
+          type: string
+          example: "Rua das Flores"
+        numero:
+          type: string
+          example: "123"
+        complemento:
+          type: string
+          example: "Apto 101"
+        bairro:
+          type: string
+          example: "Centro"
+        cidade:
+          type: string
+          example: "São Paulo"
+        estado:
+          type: string
+          example: "SP"
+        cep:
+          type: string
+          example: "01001000"
+        usuario:
+          $ref: '#/components/schemas/Usuario'
+        empresa:
+          $ref: '#/components/schemas/Empresa'
+      required:
+        - rua
+        - numero
+        - bairro
+        - cidade
+        - estado
+        - cep
+
+    Usuario:
+      type: object
+      properties:
+        idUsuario:
+          type: integer
+          example: 1
+          readOnly: true
+        cpf:
+          type: string
+          example: "123.456.789-09"
+        rne:
+          type: string
+          example: "123456789"
+        telefone:
+          type: string
+          example: "(11) 99999-9999"
+        etnia:
+          type: string
+          enum: [BRANCO, PARDO, AMARELO, INDIGENA, NEGRO]
+          example: "PARDO"
+        paisOrigem:
+          type: string
+          example: "Brasil"
+        email:
+          type: string
+          example: "usuario@exemplo.com"
+        nome:
+          type: string
+          example: "João"
+        sobrenome:
+          type: string
+          example: "Silva"
+        senha:
+          type: string
+          example: "senha123"
+          writeOnly: true
+        dataNascimento:
+          type: string
+          format: date
+          example: "1990-01-01"
+      required:
+        - email
+        - nome
+        - senha
+
+    UsuarioAtualizacao:
+      type: object
+      properties:
+        nome:
+          type: string
+          example: "João"
+        sobrenome:
+          type: string
+          example: "Silva"
+        email:
+          type: string
+          example: "usuario@exemplo.com"
+        telefone:
+          type: string
+          example: "(11) 99999-9999"
+        dataNascimento:
+          type: string
+          format: date
+          example: "1990-01-01"
+      required:
+        - nome
+        - email
+
+    Vaga:
+      type: object
+      properties:
+        idVaga:
+          type: integer
+          example: 1
+          readOnly: true
+        titulo:
+          type: string
+          example: "Desenvolvedor Java Pleno"
+        localizacao:
+          type: string
+          example: "São Paulo/SP"
+        competencias:
+          type: string
+          example: "Java, Spring Boot, SQL"
+        dataPublicacao:
+          type: string
+          format: date-time
+          example: "2023-01-01T00:00:00"
+          readOnly: true
+        modalidade:
+          type: string
+          example: "Híbrido"
+        requisitos:
+          type: string
+          example: "Formação em TI ou experiência comprovada"
+        beneficios:
+          type: string
+          example: "Vale alimentação, plano de saúde"
+        responsabilidade:
+          type: string
+          example: "Desenvolvimento de APIs REST"
+        descricaoEmpresa:
+          type: string
+          example: "Empresa líder no segmento..."
+        descricao:
+          type: string
+          example: "Procuramos profissional para..."
+        salario:
+          type: number
+          format: double
+          example: 7000.00
+        empresa:
+          $ref: '#/components/schemas/Empresa'
+      required:
+        - titulo
+        - empresa
+
+    VagaAtualizacao:
+      type: object
+      properties:
+        titulo:
+          type: string
+          example: "Desenvolvedor Java Pleno"
+        localizacao:
+          type: string
+          example: "São Paulo/SP"
+        competencias:
+          type: string
+          example: "Java, Spring Boot, SQL"
+        modalidade:
+          type: string
+          example: "Híbrido"
+        requisitos:
+          type: string
+          example: "Formação em TI ou experiência comprovada"
+        beneficios:
+          type: string
+          example: "Vale alimentação, plano de saúde"
+        responsabilidade:
+          type: string
+          example: "Desenvolvimento de APIs REST"
+        descricaoEmpresa:
+          type: string
+          example: "Empresa líder no segmento..."
+        descricao:
+          type: string
+          example: "Procuramos profissional para..."
+        salario:
+          type: number
+          format: double
+          example: 7000.00
+      required:
+        - titulo
