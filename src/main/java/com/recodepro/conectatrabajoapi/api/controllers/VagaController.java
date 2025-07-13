@@ -5,11 +5,13 @@ import com.recodepro.conectatrabajoapi.api.repositories.VagaRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.http.ResponseEntity;
 
         import java.util.List;
 
 @RestController
 @RequestMapping("/vagas")
+//@CrossOrigin(origins = "http://localhost:5173")
 public class VagaController {
 
     @Autowired
