@@ -2,16 +2,16 @@ package com.recodepro.conectatrabajoapi.api.controllers;
 
 import com.recodepro.conectatrabajoapi.api.models.Vaga;
 import com.recodepro.conectatrabajoapi.api.repositories.VagaRepository;
-
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
-        import java.util.List;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.util.List;
 
 @RestController
 @RequestMapping("/vagas")
-//@CrossOrigin(origins = "http://localhost:5173")
 public class VagaController {
 
     @Autowired
@@ -23,33 +23,62 @@ public class VagaController {
     }
 
     @PostMapping
-    public Vaga criarVaga(@RequestBody Vaga vaga) {
-        return vagaRepository.save(vaga);
+    public ResponseEntity<?> criarVaga(@RequestBody Vaga vaga) {
+        try {
+            if (vaga.getTitulo() == null || vaga.getTitulo().isEmpty()) {
+                return ResponseEntity.badRequest().body("Título é obrigatório");
+            }
+
+            if (vaga.getDataPublicacao() == null) {
+                vaga.setDataPublicacao(LocalDateTime.now(ZoneOffset.UTC));
+            }
+
+            Vaga vagaSalva = vagaRepository.save(vaga);
+            return ResponseEntity.ok(vagaSalva);
+
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body("Erro ao criar vaga: " + e.getMessage());
+        }
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Vaga> atualizarVaga(@PathVariable Long id, @RequestBody Vaga vagaAtualizada) {
-        return vagaRepository.findById(id)
-                .map(vaga -> {
-                    vaga.setTitulo(vagaAtualizada.getTitulo());
-                    vaga.setLocalizacao(vagaAtualizada.getLocalizacao());
-                    vaga.setCompetencias(vagaAtualizada.getCompetencias());
-                    vaga.setDataPublicacao(vagaAtualizada.getDataPublicacao());
-                    vaga.setModalidade(vagaAtualizada.getModalidade());
-                    vaga.setRequisitos(vagaAtualizada.getRequisitos());
-                    vaga.setBeneficios(vagaAtualizada.getBeneficios());
-                    vaga.setResponsabilidade(vagaAtualizada.getResponsabilidade());
-                    vaga.setDescricaoEmpresa(vagaAtualizada.getDescricaoEmpresa());
-                    vaga.setDescricao(vagaAtualizada.getDescricao());
-                    vaga.setSalario(vagaAtualizada.getSalario());
+    public ResponseEntity<?> atualizarVaga(@PathVariable Long id, @RequestBody Vaga vagaAtualizada) {
+        try {
+            return vagaRepository.findById(id)
+                    .map(vaga -> {
+                        vaga.setTitulo(vagaAtualizada.getTitulo());
+                        vaga.setLocalizacao(vagaAtualizada.getLocalizacao());
+                        vaga.setCompetencias(vagaAtualizada.getCompetencias());
+                        vaga.setModalidade(vagaAtualizada.getModalidade());
+                        vaga.setRequisitos(vagaAtualizada.getRequisitos());
+                        vaga.setBeneficios(vagaAtualizada.getBeneficios());
+                        vaga.setResponsabilidade(vagaAtualizada.getResponsabilidade());
+                        vaga.setDescricaoEmpresa(vagaAtualizada.getDescricaoEmpresa());
+                        vaga.setDescricao(vagaAtualizada.getDescricao());
+                        vaga.setSalario(vagaAtualizada.getSalario());
+                        vaga.setAreaAtuacao(vagaAtualizada.getAreaAtuacao());
 
-                    return ResponseEntity.ok(vagaRepository.save(vaga));
-                })
-                .orElse(ResponseEntity.notFound().build());
+                        return ResponseEntity.ok(vagaRepository.save(vaga));
+                    })
+                    .orElse(ResponseEntity.notFound().build());
+
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body("Erro ao atualizar vaga: " + e.getMessage());
+        }
     }
 
     @DeleteMapping("/{id}")
-    public void deletarVaga(@PathVariable Long id) {
-        vagaRepository.deleteById(id);
+    public ResponseEntity<?> deletarVaga(@PathVariable Long id) {
+        try {
+            if (!vagaRepository.existsById(id)) {
+                return ResponseEntity.notFound().build();
+            }
+
+            vagaRepository.deleteById(id);
+            return ResponseEntity.noContent().build();
+
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body("Erro ao deletar vaga: " + e.getMessage());
+        }
     }
 }

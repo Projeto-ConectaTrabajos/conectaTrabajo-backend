@@ -26,6 +26,7 @@ public class Vaga {
     private String descricaoEmpresa;
     private String descricao;
     private Double salario;
+    private String areaAtuacao;
 
     // Relacionamento Many-to-One (muitas vagas pertencem a uma empresa)
     @ManyToOne
@@ -136,5 +137,13 @@ public class Vaga {
 
     public void setEmpresa(Empresa empresa) {
         this.empresa = empresa;
+    }
+
+    public String getAreaAtuacao() {
+        return areaAtuacao;
+    }
+
+    public void setAreaAtuacao(String areaAtuacao) {
+        this.areaAtuacao = areaAtuacao;
     }
 }
